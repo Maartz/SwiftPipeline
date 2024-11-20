@@ -5,6 +5,11 @@ precedencegroup ThreadingPrecedence {
     higherThan: AssignmentPrecedence
 }
 
+precedencegroup BindPrecedence {
+    associativity: left
+    higherThan: NilCoalescingPrecedence
+}
+
 infix operator => : ThreadingPrecedence
 
 func => <Input, Output>(value: Input, function: (Input) -> Output) -> Output {
@@ -64,12 +69,6 @@ func <*> <A, B>(ff: [(A) -> B], fa: [A]) -> [B] {
     ff.flatMap { f in fa.map { a in f(a) } }
 }
 
-infix operator >>- : ThreadingPrecedence
-
-func >>- <A, B>(a: A?, f: (A) -> B?) -> B? {
-    a.flatMap(f)
-}
-
 infix operator >=> : ThreadingPrecedence
 
 func >=> <A, B, C>(f: @escaping (A) -> B?, g: @escaping (B) -> C?) -> (A) -> C? {
@@ -80,4 +79,16 @@ infix operator <|> : ThreadingPrecedence
 
 func <|> <A>(lhs: A?, rhs: @autoclosure () -> A?) -> A? {
     lhs ?? rhs()
+}
+
+infix operator >>- : BindPrecedence
+
+func >>- <A, B>(a: A?, f: @escaping (A) -> B?) -> B? {
+    a.flatMap(f)
+}
+
+infix operator -<< : BindPrecedence
+
+func -<< <A, B>(f: @escaping (A) -> B?, a: A?) -> B? {
+    a.flatMap(f)
 }
