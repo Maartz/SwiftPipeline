@@ -52,3 +52,14 @@ func <| <T>(value: T, wrap: (T) -> T?) -> T? {
 private func wrap<T>(_ value: T) -> T? {
     return Optional(value)
 }
+
+infix operator <*> : ThreadingPrecedence
+
+func <*> <A, B>(ff: ((A) -> B)?, fa: A?) -> B? {
+    guard let f = ff, let a = fa else { return nil }
+    return f(a)
+}
+
+func <*> <A, B>(ff: [(A) -> B], fa: [A]) -> [B] {
+    ff.flatMap { f in fa.map { a in f(a) } }
+}

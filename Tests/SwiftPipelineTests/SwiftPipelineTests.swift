@@ -70,3 +70,17 @@ struct Person {
 
     #expect(optionalResult == Optional(20))
 }
+
+@Test func testApplicativeOperatorWithOptionnal() {
+    let optionalFunction: ((Int) -> Int)? = { $0 * 2 }
+    let value: Int? = 10
+    let result = optionalFunction <*> value
+    #expect(result == 20)
+}
+
+@Test func testApplicativeOperatorWithArray() {
+    let functions = [{ $0 * 2 }, { $0 + 3 }]
+    let values = [1, 2]
+    let result = functions <*> values
+    #expect(result == [2, 4, 4, 5])
+}
