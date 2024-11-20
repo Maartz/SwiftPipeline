@@ -90,3 +90,11 @@ struct Person {
     let result = value >>- { x in x % 2 == 0 ? Optional(x * 2) : nil }
     #expect(result == nil)
 }
+
+@Test func testCompositionOperator() {
+    let f = { (x: Int) -> Int? in x > 0 ? x * 2 : nil }
+    let g = { (x: Int) -> Int? in x < 10 ? x + 1 : nil }
+    let h = f >=> g
+    #expect(h(3) == 7)
+    #expect(h(5) == nil)
+}

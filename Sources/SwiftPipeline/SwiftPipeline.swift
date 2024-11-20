@@ -69,3 +69,9 @@ infix operator >>- : ThreadingPrecedence
 func >>- <A, B>(a: A?, f: (A) -> B?) -> B? {
     a.flatMap(f)
 }
+
+infix operator >=> : ThreadingPrecedence
+
+func >=> <A, B, C>(f: @escaping (A) -> B?, g: @escaping (B) -> C?) -> (A) -> C? {
+    { a in f(a) >>- g }
+}
