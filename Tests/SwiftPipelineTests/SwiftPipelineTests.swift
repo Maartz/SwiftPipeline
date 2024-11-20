@@ -152,3 +152,99 @@ struct BindOperations {
     let i: Int? = 5
     #expect((i <|> expensiveComputation()) == 5)
 }
+
+struct ComplexOperations {
+    struct User {
+        let id: Int
+        let name: String
+        let email: String?
+        let role: Role?
+        let preferences: Preferences?
+    }
+
+    struct Role {
+        let name: String
+        let permission: [String]
+    }
+
+    struct Preferences {
+        let theme: String
+        let notifications: Bool
+    }
+
+    @Test("Complex operator chain")
+    func testComplexOperatorChain() {
+        let parseId: (String) -> Int? = { Int($0) }
+        let findUser: (Int) -> User? = { id in
+            id == 42
+                ? User(
+                    id: id, name: "John Appleseed", email: "john@appleseed.com", role: nil,
+                    preferences: nil) : nil
+        }
+
+        let validateEmail: (String) -> String? = { email in
+            email.contains("@") ? email : nil
+        }
+
+        let formatEmail: (String) -> String = { $0.uppercased() }
+
+        // Complex Chain 1: using multiple operators
+        let result =
+            parseId -<< "42"
+            >>- findUser
+            >>- { user in user.email >>- validateEmail }
+            >>- { email in Optional(formatEmail(email)) }
+
+        #expect(result == "JOHN@APPLESEED.COM")
+
+        // Complex Chain 2: Alternative Path
+        let invalidUser = (parseId -<< "invalidId" >>- findUser) <|> (findUser -<< Optional(42))
+        #expect(invalidUser?.id == 42)
+
+        // Complex Chain 3: Applicative with Alternative
+        let compute: (Int) -> (Int) -> Int? = { x in { y in (x + y) > 0 ? x + y : nil } }
+        let result2 = (parseId -<< "5" >>- compute) <*> Optional(-3) <|> Optional(10)
+        #expect(result2 == 2)
+        let result3 = (parseId -<< "invalid" >>- compute) <*> Optional(-3) <|> Optional(10)
+        #expect(result3 == 10)
+    }
+
+    @Test("Real world use case")
+    func itIsForReal() {
+        let users = [
+            User(
+                id: 1, name: "Alice", email: "alice@test.com",
+                role: Role(name: "admin", permission: ["read", "write"]),
+                preferences: Preferences(theme: "dark", notifications: true)),
+            User(id: 2, name: "Bob", email: nil, role: nil, preferences: nil),
+        ]
+
+        let getTheme =
+            users => { $0.map(\.preferences) } => { $0.map { $0?.theme } } => { themes in
+                themes.map { $0 <|> "default" }
+            }
+        #expect(getTheme == ["dark", "default"])
+
+        let hasPermission: (Role?) -> Bool? = { $0?.permission.contains("write") }
+        let adminEmails =
+            users => { $0.map(\.email) } ~=> { emails in
+                emails.enumerated().compactMap { idx, email in
+                    let role = users[idx].role
+                    return hasPermission(role) == true ? email : nil
+                }
+            }
+        #expect(adminEmails == ["alice@test.com"])
+
+        let validateEmail: (String) -> String? = { $0.contains("@") ? $0 : nil }
+        let formatEmail: (String) -> String = { $0.uppercased() }
+
+        let processedEmails =
+            users => { $0.map(\.email) } => { optionals in
+                optionals.map { email in
+                    (validateEmail -<< email >>- { Optional(formatEmail($0)) })
+                        <|> Optional("NO_EMAIL")
+                }
+            }
+        #expect(processedEmails == ["ALICE@TEST.COM", "NO_EMAIL"])
+    }
+}
