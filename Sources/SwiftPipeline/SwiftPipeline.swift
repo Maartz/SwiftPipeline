@@ -75,3 +75,9 @@ infix operator >=> : ThreadingPrecedence
 func >=> <A, B, C>(f: @escaping (A) -> B?, g: @escaping (B) -> C?) -> (A) -> C? {
     { a in f(a) >>- g }
 }
+
+infix operator <|> : ThreadingPrecedence
+
+func <|> <A>(lhs: A?, rhs: @autoclosure () -> A?) -> A? {
+    lhs ?? rhs()
+}

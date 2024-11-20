@@ -1,3 +1,4 @@
+import Foundation
 import Testing
 
 @testable import SwiftPipeline
@@ -97,4 +98,36 @@ struct Person {
     let h = f >=> g
     #expect(h(3) == 7)
     #expect(h(5) == nil)
+}
+
+@Test func testAlternativeOperator() {
+    let a: Int? = nil
+    let b: Int? = 2
+    #expect((a <|> b) == 2)
+
+    let c: Int? = 1
+    let d: Int? = 2
+    #expect((c <|> d) == 1)
+
+    let e: Int? = nil
+    let f: Int? = nil
+    let g: Int? = 5
+    #expect((e <|> f <|> g) == 5)
+
+    var sideEffect = 0
+    let h: Int? = 1
+    _ = h
+        <|> {
+            sideEffect += 1
+            return 2
+        }()
+    #expect(sideEffect == 0)
+
+    func expensiveComputation() -> Int? {
+        Thread.sleep(forTimeInterval: 0.1)
+        return 42
+    }
+
+    let i: Int? = 5
+    #expect((i <|> expensiveComputation()) == 5)
 }
