@@ -63,3 +63,9 @@ func <*> <A, B>(ff: ((A) -> B)?, fa: A?) -> B? {
 func <*> <A, B>(ff: [(A) -> B], fa: [A]) -> [B] {
     ff.flatMap { f in fa.map { a in f(a) } }
 }
+
+infix operator >>- : ThreadingPrecedence
+
+func >>- <A, B>(a: A?, f: (A) -> B?) -> B? {
+    a.flatMap(f)
+}

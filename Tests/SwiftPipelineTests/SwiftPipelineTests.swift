@@ -84,3 +84,9 @@ struct Person {
     let result = functions <*> values
     #expect(result == [2, 4, 4, 5])
 }
+
+@Test func testBindOperator() {
+    let value: Int? = 3
+    let result = value >>- { x in x % 2 == 0 ? Optional(x * 2) : nil }
+    #expect(result == nil)
+}
