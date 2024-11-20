@@ -34,3 +34,21 @@ infix operator ~=> : ThreadingPrecedence
 func ~=> <Value, Result>(_ value: Value, transform: (Value) -> Result) -> Result {
     return transform(value)
 }
+
+infix operator <| : ThreadingPrecedence
+
+func <| <T, U>(function: (T) -> U, optional: T?) -> U? {
+    return optional.map(function)
+}
+
+func <| <T, U>(function: (T) -> U, array: [T]) -> [U] {
+    return array.map(function)
+}
+
+func <| <T>(value: T, wrap: (T) -> T?) -> T? {
+    return wrap(value)
+}
+
+private func wrap<T>(_ value: T) -> T? {
+    return Optional(value)
+}

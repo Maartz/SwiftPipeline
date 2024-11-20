@@ -52,5 +52,23 @@ final class SwiftPipelineTests: XCTestCase {
 
         XCTAssertEqual(result, "Hello, Alice!")
     }
-}
 
+    func testFlatMapWithOptionnal() {
+        let value: Int? = 10
+        let result = { $0 * 2 } <| value
+        XCTAssertEqual(result, Optional(20))
+    }
+
+    func testFlatMapWithArray() {
+        let numbers = [1, 2, 3]
+        let result = { $0 * 2 } <| numbers
+        XCTAssertEqual(result, [2, 4, 6])
+    }
+
+    func testFlatMapWithThreadAs() {
+        let optionalResult =
+            10 ~=> { $0 * 2 } <| Optional.init
+
+        XCTAssertEqual(optionalResult, Optional(20))
+    }
+}
