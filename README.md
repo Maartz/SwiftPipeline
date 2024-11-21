@@ -1,5 +1,11 @@
 # SwiftPipeline
 
+[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2FMaartz%2FSwiftPipeline%2Fbadge%3Ftype%3Dswift-versions)](https://swiftpackageindex.com/Maartz/SwiftPipeline)
+
+[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2FMaartz%2FSwiftPipeline%2Fbadge%3Ftype%3Dplatforms)](https://swiftpackageindex.com/Maartz/SwiftPipeline)
+
+[![Swift Package Manager](https://img.shields.io/badge/SPM-compatible-brightgreen.svg)](https://swift.org/package-manager)
+
 SwiftPipeline is a lightweight, functional-style library for Swift that brings the power of **threading macros** and **functional operators** inspired by languages like **Clojure** and **Haskell**. With clean and expressive operators, SwiftPipeline allows you to thread data through a series of transformations in a concise and readable way.
 
 ## Features 🎯
